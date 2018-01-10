@@ -4,7 +4,7 @@ node_js:
   - 6.11.1
 env:
   - NODE_ENV="test"
-  before_script:
+before_script:
   - yarn run db:setup:user
   - yarn run db:reset
 script:
