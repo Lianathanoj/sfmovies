@@ -7,7 +7,10 @@
   "author": "Jonathan Lian <jonathan@lob.com>",
   "license": "MIT",
   "dependencies": {
-    "hapi": "14.2.0"
+    "bookshelf": "^0.12.1",
+    "hapi": "14.2.0",
+    "knex": "^0.14.2",
+    "pg": "^7.4.1"
   },
   "devDependencies": {
     "chai": "^3.0.0",
