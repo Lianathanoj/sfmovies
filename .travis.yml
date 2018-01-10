@@ -4,15 +4,9 @@ node_js:
   - 6.11.1
 env:
   - NODE_ENV="test"
-<<<<<<< HEAD
 before_script:
   - yarn db:setup:user
   - yarn db:reset
-=======
-  before_script:
-  - yarn run db:setup:user
-	- yarn run db:reset
->>>>>>> feat(migrations): add movie migrations and seeds
 script:
   - yarn test
   # - yarn enforce
