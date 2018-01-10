@@ -5,8 +5,8 @@ node_js:
 env:
   - NODE_ENV="test"
 before_script:
-  - yarn run db:setup:user
-  - yarn run db:reset
+  - yarn db:setup:user
+  - yarn db:reset
 script:
   - yarn test
   # - yarn enforce
