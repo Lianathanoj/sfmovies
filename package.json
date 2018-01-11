@@ -9,13 +9,16 @@
   "dependencies": {
     "bookshelf": "^0.12.1",
     "hapi": "14.2.0",
+    "hapi-bookshelf-serializer": "^2.1.0",
+    "hapi-format-error": "^1.1.0",
+    "joi": "12",
     "knex": "^0.14.2",
     "pg": "^7.4.1"
   },
   "devDependencies": {
     "chai": "^3.0.0",
-    "eslint": "^1.9.0",
     "eslint-config-lob": "^2.0.0",
+    "eslint": "^1.9.0",
     "generate-changelog": "^1.0.0",
     "istanbul": "^0.4.2",
     "mocha": "^2.2.5",
