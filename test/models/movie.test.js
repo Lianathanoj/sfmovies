@@ -21,6 +21,7 @@ describe('movie model', () => {
     });
 
     it('includes all of the necessary fields with title field', () => {
+
       const movie = Movie.forge().serialize({ title: titleField });
 
       expect(movie).to.have.all.keys([
