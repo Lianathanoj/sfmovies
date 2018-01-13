@@ -6,9 +6,10 @@ const MovieValidator = require('../../lib/validators/movie');
 
 describe('movie validator', () => {
 
-  describe('title or name', () => {
+  describe('title and name', () => {
 
-    it('is required', () => {
+    it('has one or the other', () => {
+
       const payload = {};
       const result = Joi.validate(payload, MovieValidator);
 
@@ -17,19 +18,8 @@ describe('movie validator', () => {
       expect(result.error.details[0].type).to.eql('object.missing');
     });
 
-    it('is less than 255 characters', () => {
-      const payload = { title: 'a'.repeat(260) };
-      const result = Joi.validate(payload, MovieValidator);
-
-      expect(result.error.details[0].path[0]).to.eql('title');
-      expect(result.error.details[0].type).to.eql('string.max');
-    });
-
-  });
-
-  describe('title and name', () => {
-
     it('are not set at the same time', () => {
+
       const payload = { title: 'WALL-E', name: 'WALL-E' };
       const result = Joi.validate(payload, MovieValidator);
 
@@ -39,6 +29,7 @@ describe('movie validator', () => {
     });
 
     it('is less than 255 characters', () => {
+
       const payload = { title: 'a'.repeat(260) };
       const result = Joi.validate(payload, MovieValidator);
 
@@ -51,6 +42,7 @@ describe('movie validator', () => {
   describe('release_year', () => {
 
     it('is after 1878', () => {
+
       const payload = {
         title: 'foo',
         release_year: 1800
@@ -62,6 +54,7 @@ describe('movie validator', () => {
     });
 
     it('is limited to 4 digits', () => {
+
       const payload = {
         title: 'foo',
         release_year: 12345

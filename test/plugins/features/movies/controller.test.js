@@ -8,6 +8,7 @@ describe('movie controller', () => {
   describe('create', () => {
 
     it('creates a movie with title attribute', () => {
+
       const payload = { title: 'WALL-E' };
       return Controller.create(payload)
       .then((movie) => {
@@ -21,6 +22,7 @@ describe('movie controller', () => {
     });
 
     it('creates a movie with name attribute', () => {
+
       const payload = { name: 'WALL-E' };
       return Controller.create(payload)
       .then((movie) => {
