@@ -6,14 +6,25 @@ const MovieValidator = require('../../lib/validators/movie');
 
 describe('movie validator', () => {
 
-  describe('title', () => {
+  describe('title and name', () => {
 
-    it('is required', () => {
+    it('has one or the other', () => {
       const payload = {};
       const result = Joi.validate(payload, MovieValidator);
 
-      expect(result.error.details[0].path[0]).to.eql('title');
-      expect(result.error.details[0].type).to.eql('any.required');
+      expect(result.error.details[0].context.peers).to.contain.members(['title', 'name']);
+      expect(result.error.details[0].type).to.eql('object.missing');
+    });
+
+    it('are not set at the same time', () => {
+      const payload = {
+        title: 'WALL-E',
+        name: 'WALL-E'
+      };
+      const result = Joi.validate(payload, MovieValidator);
+
+      expect(result.error.details[0].context.peers).to.contain.members(['title', 'name']);
+      expect(result.error.details[0].type).to.eql('object.xor');
     });
 
     it('is less than 255 characters', () => {

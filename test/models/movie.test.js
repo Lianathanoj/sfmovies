@@ -17,6 +17,13 @@ describe('movie model', () => {
       ]);
     });
 
+    it('has a title field with a name input', () => {
+      const titleField = 'title';
+      const movie = Movie.forge({ name: titleField }).serialize();
+
+      expect(movie.title).to.eql(titleField);
+    });
+
   });
 
 });
