@@ -7,8 +7,8 @@ describe('movie model', () => {
   describe('serialize', () => {
 
     it('includes all of the necessary fields', () => {
-
       const movie = Movie.forge().serialize();
+
       expect(movie).to.have.all.keys([
         'id',
         'title',
@@ -18,9 +18,9 @@ describe('movie model', () => {
     });
 
     it('has a title field with a name input', () => {
-
       const titleField = 'title';
       const movie = Movie.forge({ name: titleField }).serialize();
+      
       expect(movie.title).to.eql(titleField);
     });
 

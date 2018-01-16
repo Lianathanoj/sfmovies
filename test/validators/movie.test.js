@@ -9,7 +9,6 @@ describe('movie validator', () => {
   describe('title and name', () => {
 
     it('has one or the other', () => {
-
       const payload = {};
       const result = Joi.validate(payload, MovieValidator);
 
@@ -19,8 +18,10 @@ describe('movie validator', () => {
     });
 
     it('are not set at the same time', () => {
-
-      const payload = { title: 'WALL-E', name: 'WALL-E' };
+      const payload = {
+        title: 'WALL-E',
+        name: 'WALL-E'
+      };
       const result = Joi.validate(payload, MovieValidator);
 
       expect(result.error.details[0].message).includes('contains a conflict between exclusive peers [title, name]');
@@ -29,7 +30,6 @@ describe('movie validator', () => {
     });
 
     it('is less than 255 characters', () => {
-
       const payload = { title: 'a'.repeat(260) };
       const result = Joi.validate(payload, MovieValidator);
 
@@ -42,7 +42,6 @@ describe('movie validator', () => {
   describe('release_year', () => {
 
     it('is after 1878', () => {
-
       const payload = {
         title: 'foo',
         release_year: 1800
@@ -54,7 +53,6 @@ describe('movie validator', () => {
     });
 
     it('is limited to 4 digits', () => {
-
       const payload = {
         title: 'foo',
         release_year: 12345
