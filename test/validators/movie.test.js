@@ -12,7 +12,6 @@ describe('movie validator', () => {
       const payload = {};
       const result = Joi.validate(payload, MovieValidator);
 
-      expect(result.error.details[0].message).includes('[title, name]');
       expect(result.error.details[0].path[0]).to.eql(undefined);
       expect(result.error.details[0].type).to.eql('object.missing');
     });
@@ -24,7 +23,6 @@ describe('movie validator', () => {
       };
       const result = Joi.validate(payload, MovieValidator);
 
-      expect(result.error.details[0].message).includes('contains a conflict between exclusive peers [title, name]');
       expect(result.error.details[0].path[0]).to.eql(undefined);
       expect(result.error.details[0].type).to.eql('object.xor');
     });
