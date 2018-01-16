@@ -12,7 +12,7 @@ describe('movie validator', () => {
       const payload = {};
       const result = Joi.validate(payload, MovieValidator);
 
-      expect(result.error.details[0].path[0]).to.eql(undefined);
+      expect(result.error.details[0].context.peers).to.contain.members(['title', 'name']);
       expect(result.error.details[0].type).to.eql('object.missing');
     });
 
@@ -23,7 +23,7 @@ describe('movie validator', () => {
       };
       const result = Joi.validate(payload, MovieValidator);
 
-      expect(result.error.details[0].path[0]).to.eql(undefined);
+      expect(result.error.details[0].context.peers).to.contain.members(['title', 'name']);
       expect(result.error.details[0].type).to.eql('object.xor');
     });
 
