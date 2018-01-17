@@ -4,6 +4,6 @@ exports.up = (Knex) => {
   return Knex.raw('UPDATE movies SET name = title');
 };
 
-exports.down = (Promise) => {
+exports.down = (Knex, Promise) => {
   return Promise.resolve();
 };
