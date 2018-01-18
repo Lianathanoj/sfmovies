@@ -35,4 +35,21 @@ describe('movie controller', () => {
 
   });
 
+  describe('gets all', () => {
+
+    it('retrieves all movies', () => {
+      let length;
+
+      return Controller.getAll()
+      .then((movies) => {
+        length = movies.length;
+        return new Movie().fetchAll();
+      })
+      .then((movies) => {
+        expect(movies.length).to.eql(length);
+      });
+    });
+
+  });
+
 });

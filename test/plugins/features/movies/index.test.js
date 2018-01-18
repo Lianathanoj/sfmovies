@@ -20,4 +20,18 @@ describe('movies integration', () => {
 
   });
 
+  describe('gets all', () => {
+
+    it('retrieves all movies', () => {
+      return Movies.inject({
+        url: '/movies',
+        method: 'GET'
+      })
+      .then((response) => {
+        expect(response.statusCode).to.eql(200);
+      });
+    });
+
+  });
+
 });
