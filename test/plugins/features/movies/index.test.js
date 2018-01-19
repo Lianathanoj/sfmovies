@@ -54,6 +54,28 @@ describe('movies integration', () => {
       });
     });
 
+    it('retrieves all movies with title', () => {
+      return Movies.inject({
+        url: '/movies',
+        method: 'GET',
+        headers: { title: 'Aladdin' }
+      })
+      .then((response) => {
+        expect(response.statusCode).to.eql(200);
+      });
+    });
+
+    it('retrieves all movies with fuzzy title', () => {
+      return Movies.inject({
+        url: '/movies',
+        method: 'GET',
+        headers: { fuzzy_title: 'Aladdin' }
+      })
+      .then((response) => {
+        expect(response.statusCode).to.eql(200);
+      });
+    });
+
   });
 
 });

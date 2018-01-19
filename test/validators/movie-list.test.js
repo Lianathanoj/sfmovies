@@ -37,4 +37,17 @@ describe('movie-list validator', () => {
 
   });
 
+  describe('title', () => {
+
+    it('cannot appear with fuzzy_title', () => {
+      const params = { title: 'Aladdin', fuzzy_title: 'Ala' };
+      const result = Joi.validate(params, MovieListValidator);
+
+      expect(result.error.details[0].type).to.eql('object.without');
+      expect(result.error.details[0].context.main).to.eql('title');
+      expect(result.error.details[0].context.peer).to.eql('fuzzy_title');
+    });
+
+  });
+
 });

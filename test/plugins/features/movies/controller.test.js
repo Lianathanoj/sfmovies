@@ -70,7 +70,7 @@ describe('movie controller', () => {
       });
     });
 
-    it('retrieves all movies with within year range', () => {
+    it('retrieves all movies within year range', () => {
       const startYear = 2014;
       const endYear = startYear + 4;
       const payload = { release_year: startYear + 1, name: 'WAll-E' };
@@ -85,6 +85,46 @@ describe('movie controller', () => {
       .then((movies) => {
         length = movies.length;
         return Controller.getAll({ start_year: startYear, end_year: endYear });
+      })
+      .then((movies) => {
+        expect(movies.length).to.eql(length);
+      });
+    });
+
+    it('retrieves all movies with title', () => {
+      const title = 'Aladdin';
+      const payload = { name: title, release_year: '1992' };
+      let length;
+
+      return new Movie().save(payload)
+      .then(() => {
+        return new Movie().query((qb) => {
+          qb.where('name', title);
+        }).fetchAll();
+      })
+      .then((movies) => {
+        length = movies.length;
+        return Controller.getAll({ title });
+      })
+      .then((movies) => {
+        expect(movies.length).to.eql(length);
+      });
+    });
+
+    it('retrieves all movies with fuzzy title', () => {
+      const title = 'Aladdin';
+      const payload = { name: title, release_year: '1992' };
+      let length;
+
+      return new Movie().save(payload)
+      .then(() => {
+        return new Movie().query((qb) => {
+          qb.where('name', 'LIKE', `%${title.substr(parseInt(title.length / 2))}%`);
+        }).fetchAll();
+      })
+      .then((movies) => {
+        length = movies.length;
+        return Controller.getAll({ fuzzy_title: title });
       })
       .then((movies) => {
         expect(movies.length).to.eql(length);
