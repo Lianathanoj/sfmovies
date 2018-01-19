@@ -4,7 +4,7 @@ const Joi = require('joi');
 
 const MovieValidator = require('../../lib/validators/movie-create');
 
-describe('movie validator', () => {
+describe('movie-create validator', () => {
 
   describe('title and name', () => {
 
@@ -31,7 +31,7 @@ describe('movie validator', () => {
       const payload = { title: 'a'.repeat(260) };
       const result = Joi.validate(payload, MovieValidator);
 
-      expect(result.error.details[0].path[0]).to.eql('title');
+      expect(result.error.details[0].path).to.eql('title');
       expect(result.error.details[0].type).to.eql('string.max');
     });
 
@@ -46,7 +46,7 @@ describe('movie validator', () => {
       };
       const result = Joi.validate(payload, MovieValidator);
 
-      expect(result.error.details[0].path[0]).to.eql('release_year');
+      expect(result.error.details[0].path).to.eql('release_year');
       expect(result.error.details[0].type).to.eql('number.min');
     });
 
@@ -57,7 +57,7 @@ describe('movie validator', () => {
       };
       const result = Joi.validate(payload, MovieValidator);
 
-      expect(result.error.details[0].path[0]).to.eql('release_year');
+      expect(result.error.details[0].path).to.eql('release_year');
       expect(result.error.details[0].type).to.eql('number.max');
     });
 

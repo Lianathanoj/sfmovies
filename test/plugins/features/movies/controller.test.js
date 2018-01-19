@@ -43,7 +43,7 @@ describe('movie controller', () => {
       return Controller.getAll()
       .then((movies) => {
         length = movies.length;
-        return new Movie().fetchAll();
+        return new Movie().fetchAll()
       })
       .then((movies) => {
         expect(movies.length).to.eql(length);
@@ -59,11 +59,32 @@ describe('movie controller', () => {
       .then(() => {
         return new Movie().query((qb) => {
           qb.where('release_year', releaseYear);
-        }).fetchAll();
+        }).fetchAll()
       })
       .then((movies) => {
         length = movies.length;
-        return Controller.getAll({ release_year: releaseYear });
+        return Controller.getAll({ release_year: releaseYear })
+      })
+      .then((movies) => {
+        expect(movies.length).to.eql(length);
+      });
+    });
+
+    it('retrieves all movies with within year range', () => {
+      const startYear = 2014;
+      const endYear = startYear + 4;
+      const payload = { release_year: startYear + 1, title: 'WAll-E' };
+      let length;
+
+      return new Movie().save(payload)
+      .then(() => {
+        return new Movie().query((qb) => {
+          qb.where('release_year', '>=', startYear).andWhere('release_year', '<=', endYear);
+        }).fetchAll()
+      })
+      .then((movies) => {
+        length = movies.length;
+        return Controller.getAll({ start_year: startYear, end_year: endYear })
       })
       .then((movies) => {
         expect(movies.length).to.eql(length);
