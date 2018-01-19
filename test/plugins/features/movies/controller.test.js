@@ -35,7 +35,7 @@ describe('movie controller', () => {
 
   });
 
-  describe('gets all', () => {
+  describe('get endpoint', () => {
 
     it('retrieves all movies', () => {
       let length;
@@ -44,6 +44,26 @@ describe('movie controller', () => {
       .then((movies) => {
         length = movies.length;
         return new Movie().fetchAll();
+      })
+      .then((movies) => {
+        expect(movies.length).to.eql(length);
+      });
+    });
+
+    it('retrieves all movies with release year', () => {
+      const releaseYear = 1947;
+      const payload = { release_year: releaseYear, title: 'WAll-E' };
+      let length;
+
+      return new Movie().save(payload)
+      .then(() => {
+        return new Movie().query((qb) => {
+          qb.where('release_year', releaseYear);
+        }).fetchAll();
+      })
+      .then((movies) => {
+        length = movies.length;
+        return Controller.getAll({ release_year: releaseYear });
       })
       .then((movies) => {
         expect(movies.length).to.eql(length);
