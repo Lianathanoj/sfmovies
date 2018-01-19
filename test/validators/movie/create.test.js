@@ -2,7 +2,7 @@
 
 const Joi = require('joi');
 
-const MovieValidator = require('../../lib/validators/movie-create');
+const MovieValidator = require('../../../lib/validators/movie/create');
 
 describe('movie-create validator', () => {
 
