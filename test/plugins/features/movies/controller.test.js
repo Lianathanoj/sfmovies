@@ -2,8 +2,30 @@
 
 const Controller = require('../../../../lib/plugins/features/movies/controller');
 const Movie      = require('../../../../lib/models/movie');
+const Movies     = require('../../../../lib/models/movies');
 
 describe('movie controller', () => {
+
+  const title = 'Aladdin';
+  const similarTitle = title.substr(parseInt(title.length / 2));
+  const releaseYear = 1947;
+  const startYear = 2014;
+  const endYear = startYear + 10;
+
+  before(() => {
+    const movies = Movies.forge([
+      { name: 'WALL-E', release_year: releaseYear },
+      { name: title, release_year: 1992 },
+      { name: 'Random Movie', release_year: startYear },
+      { name: 'Something', release_year: 1975 },
+      { name: 'Nothing', release_year: 2019 },
+      { name: 'Whatever', release_year: releaseYear },
+      { name: title, release_year: 1957 },
+      { name: 'Wherever', release_year: endYear }
+    ]);
+
+    movies.invokeThen('save');
+  });
 
   describe('create', () => {
 
@@ -40,10 +62,11 @@ describe('movie controller', () => {
     it('retrieves all movies', () => {
       let length;
 
-      return Controller.getAll()
+      return new Movie().fetchAll()
       .then((movies) => {
         length = movies.length;
-        return new Movie().fetchAll();
+
+        return Controller.getAll();
       })
       .then((movies) => {
         expect(movies.length).to.eql(length);
@@ -51,16 +74,11 @@ describe('movie controller', () => {
     });
 
     it('retrieves all movies with release year', () => {
-      const releaseYear = 1947;
-      const payload = { release_year: releaseYear, name: 'WAll-E' };
       let length;
 
-      return new Movie().save(payload)
-      .then(() => {
-        return new Movie().query((qb) => {
-          qb.where('release_year', releaseYear);
-        }).fetchAll();
-      })
+      return new Movie().query((qb) => {
+        qb.where('release_year', releaseYear);
+      }).fetchAll()
       .then((movies) => {
         length = movies.length;
         return Controller.getAll({ release_year: releaseYear });
@@ -71,17 +89,11 @@ describe('movie controller', () => {
     });
 
     it('retrieves all movies within year range', () => {
-      const startYear = 2014;
-      const endYear = startYear + 4;
-      const payload = { release_year: startYear + 1, name: 'WAll-E' };
       let length;
 
-      return new Movie().save(payload)
-      .then(() => {
-        return new Movie().query((qb) => {
-          qb.where('release_year', '>=', startYear).andWhere('release_year', '<=', endYear);
-        }).fetchAll();
-      })
+      return new Movie().query((qb) => {
+        qb.where('release_year', '>=', startYear).andWhere('release_year', '<=', endYear);
+      }).fetchAll()
       .then((movies) => {
         length = movies.length;
         return Controller.getAll({ start_year: startYear, end_year: endYear });
@@ -92,16 +104,11 @@ describe('movie controller', () => {
     });
 
     it('retrieves all movies with title', () => {
-      const title = 'Aladdin';
-      const payload = { name: title, release_year: '1992' };
       let length;
 
-      return new Movie().save(payload)
-      .then(() => {
-        return new Movie().query((qb) => {
-          qb.where('name', title);
-        }).fetchAll();
-      })
+      return new Movie().query((qb) => {
+        qb.where('name', title);
+      }).fetchAll()
       .then((movies) => {
         length = movies.length;
         return Controller.getAll({ title });
@@ -112,16 +119,11 @@ describe('movie controller', () => {
     });
 
     it('retrieves all movies with fuzzy title', () => {
-      const title = 'Aladdin';
-      const payload = { name: title, release_year: '1992' };
       let length;
 
-      return new Movie().save(payload)
-      .then(() => {
-        return new Movie().query((qb) => {
-          qb.where('name', 'LIKE', `%${title.substr(parseInt(title.length / 2))}%`);
-        }).fetchAll();
-      })
+      return new Movie().query((qb) => {
+        qb.where('name', 'LIKE', `%${similarTitle}%`);
+      }).fetchAll()
       .then((movies) => {
         length = movies.length;
         return Controller.getAll({ fuzzy_title: title });
