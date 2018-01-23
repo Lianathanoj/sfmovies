@@ -1,8 +1,10 @@
 'use strict';
 
-const Controller = require('../../../../lib/plugins/features/movies/controller');
-const Movie      = require('../../../../lib/models/movie');
-const Movies     = require('../../../../lib/models/movies');
+const Movie              = require('../../../../lib/models/movie');
+const Movies             = require('../../../../lib/models/movies');
+const MovieController    = require('../../../../lib/plugins/features/movies/controller');
+const LocationController = require('../../../../lib/plugins/features/locations/controller');
+const MovieLocation      = require('../../../../lib/models/location-movie');
 
 describe('movie controller', () => {
 
@@ -32,7 +34,7 @@ describe('movie controller', () => {
     it('creates a movie with title attribute', () => {
       const payload = { title: 'WALL-E' };
 
-      return Controller.create(payload)
+      return MovieController.create(payload)
       .then((movie) => {
         expect(movie.get('name')).to.eql(payload.name);
         return new Movie({ id: movie.id }).fetch();
@@ -45,13 +47,38 @@ describe('movie controller', () => {
     it('creates a movie with name attribute', () => {
       const payload = { name: 'WALL-E' };
 
-      return Controller.create(payload)
+      return MovieController.create(payload)
       .then((movie) => {
         expect(movie.get('name')).to.eql(payload.name);
         return new Movie({ id: movie.id }).fetch();
       })
       .then((movie) => {
         expect(movie.get('name')).to.eql(payload.name);
+      });
+    });
+
+  });
+
+  describe('allocateLocation', () => {
+
+    it('allocates location to movie', () => {
+      const moviePayload = { title: 'Aladdin' };
+      const locationPayload = { name: 'San Francisco' };
+      const movieId = 1;
+      const locationId = 1;
+
+      MovieController.create(moviePayload);
+      LocationController.create(locationPayload);
+
+      return MovieController.allocateLocation(movieId, locationId)
+      .then((movieLocation) => {
+        expect(movieLocation.get('movie_id')).to.eql(movieId);
+        expect(movieLocation.get('location_id')).to.eql(locationId);
+        return new MovieLocation({ id: movieLocation.id }).fetch();
+      })
+      .then((movieLocation) => {
+        expect(movieLocation.get('movie_id')).to.eql(movieId);
+        expect(movieLocation.get('location_id')).to.eql(locationId);
       });
     });
 
@@ -66,7 +93,7 @@ describe('movie controller', () => {
       .then((movies) => {
         length = movies.length;
 
-        return Controller.getAll();
+        return MovieController.getAll();
       })
       .then((movies) => {
         expect(movies.length).to.eql(length);
@@ -81,7 +108,7 @@ describe('movie controller', () => {
       }).fetchAll()
       .then((movies) => {
         length = movies.length;
-        return Controller.getAll({ release_year: releaseYear });
+        return MovieController.getAll({ release_year: releaseYear });
       })
       .then((movies) => {
         expect(movies.length).to.eql(length);
@@ -96,7 +123,7 @@ describe('movie controller', () => {
       }).fetchAll()
       .then((movies) => {
         length = movies.length;
-        return Controller.getAll({ start_year: startYear, end_year: endYear });
+        return MovieController.getAll({ start_year: startYear, end_year: endYear });
       })
       .then((movies) => {
         expect(movies.length).to.eql(length);
@@ -111,7 +138,7 @@ describe('movie controller', () => {
       }).fetchAll()
       .then((movies) => {
         length = movies.length;
-        return Controller.getAll({ title });
+        return MovieController.getAll({ title });
       })
       .then((movies) => {
         expect(movies.length).to.eql(length);
@@ -126,11 +153,33 @@ describe('movie controller', () => {
       }).fetchAll()
       .then((movies) => {
         length = movies.length;
-        return Controller.getAll({ fuzzy_title: title });
+        return MovieController.getAll({ fuzzy_title: title });
       })
       .then((movies) => {
         expect(movies.length).to.eql(length);
       });
+    });
+
+    describe('getLocationsFromMovie', () => {
+
+      it('retrieves all locations from a movie', () => {
+        const movieId = 1;
+        let length;
+
+        return MovieController.getLocationsFromMovie(movieId)
+        .then((locations) => {
+          length = locations.length;
+
+          return new Movie().where('id', movieId).fetch({ withRelated: ['locations'] })
+          .then((movie) => {
+            return movie.related('locations');
+          });
+        })
+        .then((locations) => {
+          expect(locations.length).to.eql(length);
+        });
+      });
+
     });
 
   });
