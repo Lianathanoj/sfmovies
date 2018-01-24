@@ -29,7 +29,7 @@ describe('locations integration', () => {
       })
       .then((response) => {
         expect(response.statusCode).to.eql(200);
-        expect(response.result.object).to.eql('location_movie');
+        expect(response.result.object).to.eql('location');
       });
     });
 

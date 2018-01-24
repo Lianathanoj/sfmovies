@@ -3,7 +3,6 @@
 const MovieController    = require('../../../../lib/plugins/features/movies/controller');
 const LocationController = require('../../../../lib/plugins/features/locations/controller');
 const Location           = require('../../../../lib/models/location');
-const MovieLocation      = require('../../../../lib/models/location-movie');
 
 describe('location controller', () => {
 
@@ -36,14 +35,8 @@ describe('location controller', () => {
       LocationController.create(locationPayload);
 
       return LocationController.allocateMovie(movieId, locationId)
-      .then((movieLocation) => {
-        expect(movieLocation.get('movie_id')).to.eql(movieId);
-        expect(movieLocation.get('location_id')).to.eql(locationId);
-        return new MovieLocation({ id: movieLocation.id }).fetch();
-      })
-      .then((movieLocation) => {
-        expect(movieLocation.get('movie_id')).to.eql(movieId);
-        expect(movieLocation.get('location_id')).to.eql(locationId);
+      .then((location) => {
+        expect(location.id).to.eql(locationId);
       });
     });
 
