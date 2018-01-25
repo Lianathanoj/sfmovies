@@ -167,19 +167,12 @@ describe('movie controller', () => {
     describe('getLocationsFromMovie', () => {
 
       it('retrieves all locations from a movie', () => {
-        let length;
-
-        return MovieController.getLocationsFromMovie(movieId)
-        .then((locations) => {
-          length = locations.length;
-
-          return new Movie().where('id', movieId).fetch({ withRelated: ['locations'] })
-          .then((movie) => {
-            return movie.related('locations');
-          });
-        })
-        .then((locations) => {
-          expect(locations.length).to.eql(length);
+        return Bluebird.all([
+          MovieController.getLocationsFromMovie(movieId),
+          new Movie().where('id', movieId).fetch({ withRelated: ['locations'] })
+        ]).spread((locations, movie) => {
+          const locationsFromMovie = movie.related('locations');
+          expect(locations.length).to.eql(locationsFromMovie.length);
         });
       });
 
