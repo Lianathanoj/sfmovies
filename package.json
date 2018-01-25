@@ -7,6 +7,7 @@
   "author": "Jonathan Lian <jonathan@lob.com>",
   "license": "MIT",
   "dependencies": {
+    "bluebird": "^3.5.1",
     "bookshelf": "^0.12.1",
     "hapi": "14.2.0",
     "hapi-bookshelf-serializer": "^2.1.0",
@@ -17,8 +18,8 @@
   },
   "devDependencies": {
     "chai": "^3.0.0",
-    "eslint-config-lob": "^2.0.0",
     "eslint": "^1.9.0",
+    "eslint-config-lob": "^2.0.0",
     "generate-changelog": "^1.0.0",
     "istanbul": "^0.4.2",
     "mocha": "^2.2.5",

@@ -1,8 +1,33 @@
 'use strict';
 
-const Server = require('../../../../lib/server');
+const Bluebird = require('bluebird');
+
+const Knex     = require('../../../../lib/libraries/knex');
+const Server   = require('../../../../lib/server');
+const Location = require('../../../../lib/models/location');
+const Movie    = require('../../../../lib/models/movie');
 
 describe('movies integration', () => {
+
+  let locationId;
+  let movieId;
+
+  before(() => {
+    return Bluebird.all([
+      Knex.raw('TRUNCATE locations_movies CASCADE'),
+      Knex.raw('TRUNCATE locations CASCADE'),
+      Knex.raw('TRUNCATE movies CASCADE')
+    ]).then(() => {
+      return Bluebird.all([
+        new Movie().save({ name: 'Aladdin' }),
+        new Location().save({ name: 'San Francisco' })
+      ])
+      .spread((movie, location) => {
+        movieId = movie.id;
+        locationId = location.id;
+      });
+    });
+  });
 
   describe('create', () => {
 
@@ -24,12 +49,11 @@ describe('movies integration', () => {
 
     it('allocates a location to movie', () => {
       return Server.inject({
-        url: '/movies/1/locations/1',
+        url: `/movies/${movieId}/locations/${locationId}`,
         method: 'POST'
       })
       .then((response) => {
         expect(response.statusCode).to.eql(200);
-        expect(response.result.object).to.eql('movie');
       });
     });
 
@@ -93,7 +117,7 @@ describe('movies integration', () => {
 
     it('retrieves all locations from a movie', () => {
       return Server.inject({
-        url: '/movies/1/locations',
+        url: `/movies/${movieId}/locations`,
         method: 'GET'
       })
       .then((response) => {

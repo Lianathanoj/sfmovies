@@ -1,10 +1,33 @@
 'use strict';
 
-const MovieController    = require('../../../../lib/plugins/features/movies/controller');
+const Bluebird = require('bluebird');
+
+const Knex               = require('../../../../lib/libraries/knex');
 const LocationController = require('../../../../lib/plugins/features/locations/controller');
 const Location           = require('../../../../lib/models/location');
+const Movie              = require('../../../../lib/models/movie');
 
 describe('location controller', () => {
+
+  let movieId;
+  let locationId;
+
+  before(() => {
+    return Bluebird.all([
+      Knex.raw('TRUNCATE locations_movies CASCADE'),
+      Knex.raw('TRUNCATE locations CASCADE'),
+      Knex.raw('TRUNCATE movies CASCADE')
+    ]).then(() => {
+      return Bluebird.all([
+        new Movie().save({ name: 'Aladdin' }),
+        new Location().save({ name: 'San Francisco' })
+      ])
+      .spread((movie, location) => {
+        movieId = movie.id;
+        locationId = location.id;
+      });
+    });
+  });
 
   describe('create', () => {
 
@@ -26,14 +49,6 @@ describe('location controller', () => {
   describe('allocateMovie', () => {
 
     it('allocates movie to location', () => {
-      const moviePayload = { title: 'Aladdin' };
-      const locationPayload = { name: 'San Francisco' };
-      const movieId = 1;
-      const locationId = 1;
-
-      MovieController.create(moviePayload);
-      LocationController.create(locationPayload);
-
       return LocationController.allocateMovie(movieId, locationId)
       .then((location) => {
         expect(location.id).to.eql(locationId);
@@ -45,7 +60,6 @@ describe('location controller', () => {
   describe('getMoviesFromLocation', () => {
 
     it('retrieves all movies from a location', () => {
-      const locationId = 1;
       let length;
 
       return LocationController.getMoviesFromLocation(locationId)
