@@ -1,8 +1,12 @@
 'use strict';
 
-const Controller = require('../../../../lib/plugins/features/movies/controller');
-const Movie      = require('../../../../lib/models/movie');
-const Movies     = require('../../../../lib/models/movies');
+const Bluebird = require('bluebird');
+
+const Knex            = require('../../../../lib/libraries/knex');
+const Movie           = require('../../../../lib/models/movie');
+const Movies          = require('../../../../lib/models/movies');
+const Location        = require('../../../../lib/models/location');
+const MovieController = require('../../../../lib/plugins/features/movies/controller');
 
 describe('movie controller', () => {
 
@@ -11,6 +15,8 @@ describe('movie controller', () => {
   const releaseYear = 1947;
   const startYear = 2014;
   const endYear = startYear + 10;
+  let movieId;
+  let locationId;
 
   before(() => {
     const movies = Movies.forge([
@@ -24,7 +30,21 @@ describe('movie controller', () => {
       { name: 'Wherever', release_year: endYear }
     ]);
 
-    movies.invokeThen('save');
+    return Bluebird.all([
+      Knex.raw('TRUNCATE locations_movies CASCADE'),
+      Knex.raw('TRUNCATE locations CASCADE'),
+      Knex.raw('TRUNCATE movies CASCADE'),
+      movies.invokeThen('save')
+    ]).then(() => {
+      return Bluebird.all([
+        new Movie().save({ name: 'Aladdin' }),
+        new Location().save({ name: 'San Francisco' })
+      ])
+      .spread((movie, location) => {
+        movieId = movie.id;
+        locationId = location.id;
+      });
+    });
   });
 
   describe('create', () => {
@@ -32,7 +52,7 @@ describe('movie controller', () => {
     it('creates a movie with title attribute', () => {
       const payload = { title: 'WALL-E' };
 
-      return Controller.create(payload)
+      return MovieController.create(payload)
       .then((movie) => {
         expect(movie.get('name')).to.eql(payload.name);
         return new Movie({ id: movie.id }).fetch();
@@ -45,13 +65,24 @@ describe('movie controller', () => {
     it('creates a movie with name attribute', () => {
       const payload = { name: 'WALL-E' };
 
-      return Controller.create(payload)
+      return MovieController.create(payload)
       .then((movie) => {
         expect(movie.get('name')).to.eql(payload.name);
         return new Movie({ id: movie.id }).fetch();
       })
       .then((movie) => {
         expect(movie.get('name')).to.eql(payload.name);
+      });
+    });
+
+  });
+
+  describe('allocateLocation', () => {
+
+    it('allocates location to movie', () => {
+      return MovieController.allocateLocation(movieId, locationId)
+      .then((movie) => {
+        expect(movie.id).to.eql(movieId);
       });
     });
 
@@ -66,7 +97,7 @@ describe('movie controller', () => {
       .then((movies) => {
         length = movies.length;
 
-        return Controller.getAll();
+        return MovieController.getAll();
       })
       .then((movies) => {
         expect(movies.length).to.eql(length);
@@ -81,7 +112,7 @@ describe('movie controller', () => {
       }).fetchAll()
       .then((movies) => {
         length = movies.length;
-        return Controller.getAll({ release_year: releaseYear });
+        return MovieController.getAll({ release_year: releaseYear });
       })
       .then((movies) => {
         expect(movies.length).to.eql(length);
@@ -96,7 +127,7 @@ describe('movie controller', () => {
       }).fetchAll()
       .then((movies) => {
         length = movies.length;
-        return Controller.getAll({ start_year: startYear, end_year: endYear });
+        return MovieController.getAll({ start_year: startYear, end_year: endYear });
       })
       .then((movies) => {
         expect(movies.length).to.eql(length);
@@ -111,7 +142,7 @@ describe('movie controller', () => {
       }).fetchAll()
       .then((movies) => {
         length = movies.length;
-        return Controller.getAll({ title });
+        return MovieController.getAll({ title });
       })
       .then((movies) => {
         expect(movies.length).to.eql(length);
@@ -126,11 +157,25 @@ describe('movie controller', () => {
       }).fetchAll()
       .then((movies) => {
         length = movies.length;
-        return Controller.getAll({ fuzzy_title: title });
+        return MovieController.getAll({ fuzzy_title: title });
       })
       .then((movies) => {
         expect(movies.length).to.eql(length);
       });
+    });
+
+    describe('getLocationsFromMovie', () => {
+
+      it('retrieves all locations from a movie', () => {
+        return Bluebird.all([
+          MovieController.getLocationsFromMovie(movieId),
+          new Movie().where('id', movieId).fetch({ withRelated: ['locations'] })
+        ]).spread((locations, movie) => {
+          const locationsFromMovie = movie.related('locations');
+          expect(locations.length).to.eql(locationsFromMovie.length);
+        });
+      });
+
     });
 
   });
